@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OG Panel Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+<aside class="sidebar">
+<div class="logo">OG<span>Panel</span></div>
+<nav>
+<div class="nav-item active" onclick="showSection('add-request')"><span class="nav-icon">+</span>Add Request</div>
+<div class="nav-item" onclick="showSection('orders')"><span class="nav-icon">&#9744;</span>Active Orders</div>
+<div class="nav-item" onclick="showSection('order-history')"><span class="nav-icon">&#9745;</span>Order History</div>
+<div class="nav-item" onclick="showSection('smm-panels')"><span class="nav-icon">&#9881;</span>SMM Panels</div>
+</nav>
+</aside>
+
+<main class="main-content">
+<header>
+<h1 id="page-title">Add New Request</h1>
+</header>
+
+<div class="stats-grid">
+<div class="stat-card running"><div class="stat-label">Running</div><div class="stat-value" id="stat-running">0</div></div>
+<div class="stat-card pending"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending">0</div></div>
+<div class="stat-card scheduled"><div class="stat-label">Scheduled</div><div class="stat-value" id="stat-scheduled">0</div></div>
+<div class="stat-card completed"><div class="stat-label">Completed</div><div class="stat-value" id="stat-completed">0</div></div>
+<div class="stat-card providers"><div class="stat-label">Providers</div><div class="stat-value" id="stat-providers">0</div></div>
+<div class="stat-card delivered"><div class="stat-label">Total Delivered</div><div class="stat-value" id="stat-delivered">0</div></div>
+</div>
+
+<section id="add-request-section" class="section active">
+<div class="controls">
+<div class="input-row">
+<div class="input-field flex-2"><label>Video Link</label><input type="text" id="link" placeholder="https://instagram.com/reel/..."></div>
+<div class="input-field"><label>Target Views</label><input type="number" id="views" value="1000"></div>
+</div>
+<div class="input-row">
+<div class="input-field"><label>Order Name</label><input type="text" id="order_name" placeholder="My Order"></div>
+<div class="input-field"><label>Select Provider</label><select id="provider_select"><option value="">No Provider</option></select></div>
+</div>
+<div class="sids">
+<div class="sid-field"><label>Views SID</label><input type="text" id="views_sid" placeholder="1"></div>
+<div class="sid-field"><label>Likes SID</label><input type="text" id="likes_sid" placeholder="2"></div>
+<div class="sid-field"><label>Shares SID</label><input type="text" id="shares_sid" placeholder="3"></div>
+<div class="sid-field"><label>Saves SID</label><input type="text" id="saves_sid" placeholder="4"></div>
+<div class="sid-field"><label>Reposts SID</label><input type="text" id="reposts_sid" placeholder="5"></div>
+</div>
+<div class="modules">
+<label class="module checked"><input type="checkbox" id="views_enabled" checked onchange="syncModule(this)"><span>👁 Views</span></label>
+<label class="module"><input type="checkbox" id="likes_enabled" onchange="syncModule(this)"><span>❤ Likes</span></label>
+<label class="module"><input type="checkbox" id="shares_enabled" onchange="syncModule(this)"><span>↗ Shares</span></label>
+<label class="module"><input type="checkbox" id="saves_enabled" onchange="syncModule(this)"><span>🔖 Saves</span></label>
+<label class="module"><input type="checkbox" id="reposts_enabled" onchange="syncModule(this)"><span>🔁 Reposts</span></label>
+</div>
+<div class="pct-inputs">
+<div class="pct-field"><label>Likes %</label><input type="number" id="like_pct" value="1" step="any"></div>
+<div class="pct-field"><label>Shares %</label><input type="number" id="share_pct" value="0.2" step="any"></div>
+<div class="pct-field"><label>Saves %</label><input type="number" id="save_pct" value="0.4" step="any"></div>
+<div class="pct-field"><label>Reposts %</label><input type="number" id="repost_pct" value="0.1" step="any"></div>
+</div>
+<div class="schedule-options">
+<div class="schedule-tabs">
+<div class="schedule-tab active" data-st="immediate" onclick="setStartType('immediate')"><span class="tab-icon">⚡</span>Start Immediately</div>
+<div class="schedule-tab" data-st="scheduled" onclick="setStartType('scheduled')"><span class="tab-icon">🗓</span>Schedule Start</div>
+</div>
+<input type="hidden" id="start_type_val" value="immediate">
+<div class="schedule-picker" id="schedulePicker">
+<div class="schedule-datetime">
+<input type="datetime-local" id="schedule_datetime">
+</div>
+</div>
+</div>
+<button class="btn-start" onclick="addOrder()">🚀 Start Order</button>
+</div>
+</section>
+
+<section id="orders-section" class="section">
+<div class="orders-grid" id="ordersGrid"><div class="empty-state">No Active Orders</div></div>
+</section>
+
+<section id="order-history-section" class="section">
+<div class="orders-grid" id="historyGrid"><div class="empty-state">No Order History</div></div>
+</section>
+
+<section id="smm-panels-section" class="section">
+<div class="provider-form">
+<h3>Add New SMM Panel</h3>
+<div class="provider-inputs">
+<div class="input-field"><label>Provider Name</label><input type="text" id="provider_name" placeholder="My SMM Panel"></div>
+<div class="input-field"><label>API URL</label><input type="text" id="provider_url" placeholder="https://panel.example.com/api/v2"></div>
+<div class="input-field"><label>API Key</label><input type="text" id="provider_key" placeholder="Your API key"></div>
+</div>
+<button class="btn-add" onclick="addProvider()">Add Panel</button>
+</div>
+<div class="providers-list" id="providersList"><div class="empty-state">No SMM Panels</div></div>
+<div class="management-buttons">
+<button class="btn-mgmt" onclick="exportOrders()">Export Orders</button>
+<button class="btn-mgmt" onclick="exportProviders()">Export Providers</button>
+<button class="btn-mgmt" onclick="createBackup()">Backup System</button>
+<button class="btn-mgmt btn-danger" onclick="clearCompleted()">Clear Completed</button>
+</div>
+</section>
+</main>
+</div>
+
+<script src="js/mock-backend.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
